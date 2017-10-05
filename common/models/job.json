@@ -6,6 +6,12 @@
     "validateUpsert": true
   },
   "properties": {
+    "distance": {
+      "type": "string"
+    },
+    "price": {
+      "type": "string"
+    },
     "time": {
       "type": "date"
     },
