@@ -1,0 +1,17 @@
+{
+  "db": {
+    "name": "db",
+    "connector": "memory"
+  },
+  "graberMongo": {
+    "host": "ds161304.mlab.com",
+    "port": "61304",
+    "url":
+      "mongodb://minhchienwikipedia:123456789a@ds161304.mlab.com:61304/graber",
+    "database": "graber",
+    "password": "123456789a",
+    "name": "graberMongo",
+    "user": "minhchienwikipedia",
+    "connector": "mongodb"
+  }
+}

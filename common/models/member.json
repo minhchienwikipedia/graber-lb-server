@@ -1,0 +1,48 @@
+{
+  "name": "member",
+  "plural": "members",
+  "base": "User",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "avatar": {
+      "type": "string"
+    }
+  },
+  "validations": [],
+  "relations": {
+    "job": {
+      "type": "hasMany",
+      "model": "job",
+      "foreignKey": "memberId"
+    },
+    "accessTokens": {
+      "type": "hasMany",
+      "model": "accessToken",
+      "polymorphic": {
+        "foreignKey": "userId",
+        "discriminator": "principalType"
+      },
+      "options": {
+        "disableInclude": true
+      }
+    },
+    "roles": {
+      "type": "hasMany",
+      "model": "Role",
+      "foreignKey": "principalId",
+      "through": "RoleMapping"
+    }
+  },
+  "acls": [
+    {
+      "accessType": "*",
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW"
+    }
+  ],
+  "methods": {}
+}
