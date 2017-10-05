@@ -10,7 +10,7 @@
       "type": "string"
     },
     "price": {
-      "type": "string"
+      "type": "number"
     },
     "time": {
       "type": "date"
@@ -23,7 +23,7 @@
   "relations": {
     "member": {
       "type": "belongsTo",
-      "model": "Member",
+      "model": "member",
       "foreignKey": ""
     },
     "driver": {
