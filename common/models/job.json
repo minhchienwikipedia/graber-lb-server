@@ -12,8 +12,11 @@
     "price": {
       "type": "number"
     },
-    "time": {
+    "created": {
       "type": "date"
+    },
+    "time": {
+      "type": "string"
     },
     "status": {
       "type": "string"
