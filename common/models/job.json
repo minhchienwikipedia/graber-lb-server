@@ -6,6 +6,12 @@
     "validateUpsert": true
   },
   "properties": {
+    "addressStart": {
+      "type": "object"
+    },
+    "addressEnd": {
+      "type": "object"
+    },
     "distance": {
       "type": "string"
     },
@@ -14,9 +20,6 @@
     },
     "created": {
       "type": "date"
-    },
-    "time": {
-      "type": "string"
     },
     "status": {
       "type": "string"
