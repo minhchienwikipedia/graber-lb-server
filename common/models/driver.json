@@ -9,6 +9,12 @@
   "properties": {
     "avatar": {
       "type": "string"
+    },
+    "status": {
+      "type": "string"
+    },
+    "region": {
+      "type": "object"
     }
   },
   "validations": [],

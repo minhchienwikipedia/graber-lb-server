@@ -3,7 +3,7 @@
 var loopback = require('loopback');
 var boot = require('loopback-boot');
 
-var app = module.exports = loopback();
+var app = (module.exports = loopback());
 
 app.start = function() {
   // start the web server
@@ -25,5 +25,136 @@ boot(app, __dirname, function(err) {
 
   // start the server if `$ node server.js`
   if (require.main === module)
-    app.start();
+    // app.start();
+    app.io = require('socket.io')(app.start());
+  let io = app.io;
+  require('socketio-auth')(app.io, {
+    authenticate: function(socket, value, callback) {
+      var AccessToken = app.models.accessToken;
+      // get credentials sent by the client
+      var token = AccessToken.find(
+        {
+          where: {
+            userId: value.userId,
+            id: value.id,
+          },
+        },
+        function(err, tokenDetail) {
+          if (err) throw err;
+          if (tokenDetail.length > 0) {
+            callback(null, true);
+          } else {
+            callback(null, false);
+          }
+        }
+      ); // find function..
+    }, // authenticate function..
+  });
+
+  app.io.on('connection', function(socket) {
+    console.log('a user connected');
+    socket.on('disconnect', reason => {
+      console.log('user disconnected', reason);
+    });
+
+    // let promiseLocation = new Promise((resolve, reject) => {
+    //   var driver = app.models.driver;
+    //   socket.on('location-client', function(data) {
+    //     driver.updateAll({region: data}, function(err, data) {
+    //       if (err) reject(err);
+    //       resolve(data);
+    //     });
+    //   });
+    // });
+    // promiseLocation.then().catch(reason => {
+    //   console.log(reason);
+    // });
+
+    // Get list driver
+    let promiseDriver = new Promise((resolve, reject) => {
+      var driver = app.models.driver;
+      driver.find(
+        {
+          where: {
+            status: 'available',
+          },
+        },
+        function(err, data) {
+          if (err) reject(err);
+          resolve(data);
+        }
+      );
+    });
+    promiseDriver
+      .then(value => {
+        io.emit('get-driver', value);
+      })
+      .catch(reason => {
+        console.log(reason);
+      });
+
+    // Get list job emit to client
+    let promise = new Promise((resolve, reject) => {
+      var job = app.models.job;
+      job.find(
+        {
+          include: ['member', 'driver'],
+          where: {
+            status: 'available',
+          },
+        },
+        function(err, data) {
+          if (err) reject(err);
+          resolve(data);
+        }
+      );
+    });
+    promise
+      .then(value => {
+        io.emit('get-job', value);
+      })
+      .catch(reason => {
+        console.log(reason);
+      });
+
+    // Update region position
+
+    socket.on('location-client', function(data) {
+      let promiseLocation = new Promise((resolve, reject) => {
+        var driver = app.models.driver;
+        driver.updateAll({region: data}, function(err, data) {
+          if (err) reject(err);
+          resolve(data);
+        });
+      });
+
+      promiseLocation
+        .then(value => {
+          let promiseDriver1 = new Promise((resolve, reject) => {
+            var driver = app.models.driver;
+            driver.find(
+              {
+                where: {
+                  status: 'available',
+                },
+              },
+              function(err, data) {
+                if (err) reject(err);
+                resolve(data);
+              }
+            );
+          });
+          promiseDriver1
+            .then(val => {
+              io.emit('get-driver', val);
+            })
+            .catch(reason => {
+              console.log(reason);
+            });
+        })
+        .catch(reason => {
+          console.log(reason);
+        });
+    });
+  });
 });
