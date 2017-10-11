@@ -1,11 +1,16 @@
 {
   "name": "job",
   "base": "PersistedModel",
-  "idInjection": true,
+  "idInjection": false,
   "options": {
     "validateUpsert": true
   },
   "properties": {
+    "jobId": {
+      "type": "string",
+      "id": true,
+      "generated": true
+    },
     "addressStart": {
       "type": "object"
     },

@@ -30,30 +30,64 @@ boot(app, __dirname, function(err) {
   let io = app.io;
   require('socketio-auth')(app.io, {
     authenticate: function(socket, value, callback) {
-      var AccessToken = app.models.accessToken;
       // get credentials sent by the client
-      var token = AccessToken.find(
-        {
-          where: {
-            userId: value.userId,
-            id: value.id,
+      callback(null, true);
+
+      let promiseToken = new Promise((resolve, reject) => {
+        var AccessToken = app.models.accessToken;
+        AccessToken.find(
+          {
+            where: {
+              userId: value.userId,
+              id: value.id,
+            },
           },
-        },
-        function(err, tokenDetail) {
-          if (err) throw err;
-          if (tokenDetail.length > 0) {
+          function(err, tokenDetail) {
+            if (err) reject(err);
+            resolve(tokenDetail);
+          }
+        );
+      });
+
+      promiseToken
+        .then(value => {
+          if (value.length > 0) {
             callback(null, true);
           } else {
             callback(null, false);
           }
-        }
-      ); // find function..
+        })
+        .catch(reason => {
+          console.log(reason);
+        });
+
+      // var token = AccessToken.find(
+      //   {
+      //     where: {
+      //       userId: value.userId,
+      //       id: value.id,
+      //     },
+      //   },
+      //   function(err, tokenDetail) {
+      //     if (err) throw err;
+      //     console.log('tokenDetail', tokenDetail);
+      //     console.log('err', err);
+      //     // callback(null, true);
+      //     // if (tokenDetail.length > 0) {
+      //     //   callback(null, true);
+      //     // } else {
+      //     //   callback(null, false);
+      //     // }
+      //   }
+      // ); // find function..
     }, // authenticate function..
   });
 
   app.io.on('connection', function(socket) {
     console.log('a user connected');
     socket.on('disconnect', reason => {
+      // socket.disconnect(true);
+      // console.info('disconnected user (id=' + socket.id + ').');
       console.log('user disconnected', reason);
     });
 
@@ -70,7 +104,10 @@ boot(app, __dirname, function(err) {
     //   console.log(reason);
     // });
 
-    // Get list driver
+    // ==========================================
+    // ================ Get list driver ==================
+    // ==========================================
+
     let promiseDriver = new Promise((resolve, reject) => {
       var driver = app.models.driver;
       driver.find(
@@ -92,8 +129,10 @@ boot(app, __dirname, function(err) {
       .catch(reason => {
         console.log(reason);
       });
+    // ==========================================
+    // ================Get list job emit to client==================
+    // ==========================================
 
-    // Get list job emit to client
     let promise = new Promise((resolve, reject) => {
       var job = app.models.job;
       job.find(
@@ -116,16 +155,25 @@ boot(app, __dirname, function(err) {
       .catch(reason => {
         console.log(reason);
       });
-
-    // Update region position
-
+    // =================================================
+    // ============ Update region position==============
+    // =================================================
     socket.on('location-client', function(data) {
       let promiseLocation = new Promise((resolve, reject) => {
         var driver = app.models.driver;
-        driver.updateAll({region: data}, function(err, data) {
-          if (err) reject(err);
-          resolve(data);
-        });
+        console.log(data);
+        driver.updateAll(
+          {
+            where: {
+              $oid: data.userId,
+            },
+          },
+          {region: data.region},
+          function(err, data) {
+            if (err) reject(err);
+            resolve(data);
+          }
+        );
       });
 
       promiseLocation
@@ -155,6 +203,12 @@ boot(app, __dirname, function(err) {
         .catch(reason => {
           console.log(reason);
         });
+    });
+    // ==========================================
+    // ============== Create job ============================
+    // ==========================================
+    io.on('create-job', function(data) {
+      console.log(data);
     });
   });
 });

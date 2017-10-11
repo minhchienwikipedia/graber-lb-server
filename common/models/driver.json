@@ -2,11 +2,32 @@
   "name": "driver",
   "plural": "drivers",
   "base": "User",
-  "idInjection": true,
+  "idInjection": false,
   "options": {
     "validateUpsert": true
   },
   "properties": {
+    "driverId": {
+      "type": "string",
+      "id": true,
+      "generated": true
+    },
+    "name": {
+      "type": "string",
+      "require": true
+    },
+    "licensePlateNumber": {
+      "type": "string",
+      "require": true
+    },
+    "vehicleType": {
+      "type": "string",
+      "require": true
+    },
+    "phone": {
+      "type": "string",
+      "require": true
+    },
     "avatar": {
       "type": "string"
     },

@@ -2,11 +2,16 @@
   "name": "member",
   "plural": "members",
   "base": "User",
-  "idInjection": true,
+  "idInjection": false,
   "options": {
     "validateUpsert": true
   },
   "properties": {
+    "memberId": {
+      "type": "string",
+      "id": true,
+      "generated": true
+    },
     "avatar": {
       "type": "string"
     }
