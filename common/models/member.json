@@ -14,6 +14,9 @@
     },
     "avatar": {
       "type": "string"
+    },
+    "phone": {
+      "type": "string"
     }
   },
   "validations": [],
